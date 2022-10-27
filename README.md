@@ -1,8 +1,8 @@
 # api.hungr.dev
 
-Endpoint           Methods  Rule
+Endpoint         |  Methods | Rule
 -----------------  -------  -----------------------
-addGroceryList     POST     /groceryList
+addGroceryList    | POST    | /groceryList
 addItem            POST     /items
 deleteGroceryList  DELETE   /groceryList
 deleteItem         DELETE   /items
