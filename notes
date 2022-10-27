@@ -1,0 +1,3 @@
+To generate all the routes for the api 
+
+flask --app main routes
