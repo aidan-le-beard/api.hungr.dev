@@ -122,6 +122,7 @@ def updateItem():
 def deleteItem(): 
     connection = sqlite3.connect("dev.db")
 
+    print("TESTING")
     id = int(request.args.get('id'))
     print(id)
 
