@@ -122,10 +122,12 @@ def updateItem():
 def deleteItem(): 
     connection = sqlite3.connect("dev.db")
 
+    id = int(request.args.get('id'))
+    print(id)
+
     if id is None: 
         print("No ID given")
     else: 
-        id = int(request.args.get('id'))
         cursor = connection.cursor()
         cursor.execute("delete from item where id = %i;" % id )
         print("delete from item where id = %i" % id)
