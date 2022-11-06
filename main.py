@@ -122,18 +122,6 @@ def updateItem():
 def deleteItem(): 
     connection = sqlite3.connect("dev.db")
 
-    print("TESTING")
-    id = int(request.args.get('id'))
-    print(id)
-
-    if id is None: 
-        print("No ID given")
-    else: 
-        cursor = connection.cursor()
-        cursor.execute("delete from item where id = %i;" % id )
-        print("delete from item where id = %i" % id)
-        connection.commit()
-        return("delete from item where id = %i" % id)
 
 # DELETE grocery lists
 @app.route("/groceryList", methods = ['DELETE'])
