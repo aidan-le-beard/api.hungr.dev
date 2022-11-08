@@ -2,7 +2,7 @@ from flask import Flask, request
 import json
 import sqlite3
 
-app = Flask(__name__) # http://api.hungr.dev:5000/
+app = Flask(__name__) # http://api.hungr.dev:5000/ --> (now http://api.hungr.dev/)
 
 app.debug = True
 
@@ -42,7 +42,9 @@ def getListItems():
             name=item[1], 
             count=item[2], 
             note=item[3], 
-            groceryList=item[4]))
+            groceryList=item[4],
+            frequency=item[5],
+            username=item[6]))
             
     return json.dumps(data)
     
@@ -81,13 +83,15 @@ def addItem():
     count = int(request.args.get('count'))
     note = request.args.get('note')
     groceryList = request.args.get('groceryList')
+    frequency = request.args.get('frequency')
+    username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
     if note:
-        cursor.execute("insert into item (name, count, note, groceryList) values ('%s', %i, '%s', '%s')" % (name, count, note, groceryList))
+        cursor.execute("insert into item (name, count, note, groceryList, frequency, username) values ('%s', %i, '%s', '%s', '%i', '%s')" % (name, count, note, groceryList, frequency, username))
         print ("with note")
     else:
-        cursor.execute("insert into item (name, count, groceryList) values ('%s', %i, '%s')" % (name, count, groceryList))
+        cursor.execute("insert into item (name, count, groceryList) values ('%s', %i, '%s', '%i', '%s')" % (name, count, groceryList, frequency, username))
         print ("without note")
     connection.commit()
 
@@ -97,7 +101,7 @@ def addItem():
 	
     
     
-
+# Does this need to change from adding frequency and username columns? -- Aidan
 #UPDATE
 @app.route("/items", methods = ['PATCH'])
 def updateItem():
@@ -117,6 +121,7 @@ def updateItem():
         return ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
     connection.commit()
     
+# Does this need to change from adding frequency and username columns? -- Aidan
 # DELETE items
 @app.route("/items", methods = ['DELETE'])
 def deleteItem(): 
