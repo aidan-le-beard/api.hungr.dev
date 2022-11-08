@@ -5,6 +5,8 @@ import sqlite3
 app = Flask(__name__) # http://api.hungr.dev:5000/ --> (now http://api.hungr.dev/)
 
 app.debug = True
+#app.run(debug=True) # changed above line, supposedly this auto-refreshes?
+# Narrator: looks like it did not. Changed back to the above...
 
 # home page
 @app.route("/")
