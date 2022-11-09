@@ -85,7 +85,7 @@ def addItem():
     count = int(request.args.get('count'))
     note = request.args.get('note')
     groceryList = request.args.get('groceryList')
-    frequency = request.args.get('frequency')
+    frequency = int(request.args.get('frequency'))
     username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
@@ -93,7 +93,7 @@ def addItem():
         cursor.execute("insert into item (name, count, note, groceryList, frequency, username) values ('%s', %i, '%s', '%s', '%i', '%s')" % (name, count, note, groceryList, frequency, username))
         print ("with note")
     else:
-        cursor.execute("insert into item (name, count, groceryList) values ('%s', %i, '%s', '%i', '%s')" % (name, count, groceryList, frequency, username))
+        cursor.execute("insert into item (name, count, groceryList, frequency, username) values ('%s', %i, '%s', '%i', '%s')" % (name, count, groceryList, frequency, username))
         print ("without note")
     connection.commit()
 
