@@ -46,7 +46,8 @@ def getListItems():
             note=item[3], 
             groceryList=item[4],
             frequency=item[5],
-            username=item[6]))
+            username=item[6],
+            visible=item[7]))
             
     return json.dumps(data)
     
@@ -86,46 +87,68 @@ def addItem():
     count = int(request.args.get('count'))
     note = request.args.get('note')
     groceryList = request.args.get('groceryList')
-    frequency = int(request.args.get('frequency'))
     username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
     for item in nameParameters:     
         name = item
         if note:
-            cursor.execute("insert into item (name, count, note, groceryList, frequency, username) values ('%s', %i, '%s', '%s', '%i', '%s')" % (name, count, note, groceryList, frequency, username))
+            cursor.execute("insert into item (name, count, note, groceryList, frequency, username, visible) values ('%s', %i, '%s', '%s', '%i', '%s', '%i')" % (name, count, note, groceryList, 0, username, 1))
             print ("with note")
         else:
-            cursor.execute("insert into item (name, count, groceryList, frequency, username) values ('%s', %i, '%s', '%i', '%s')" % (name, count, groceryList, frequency, username))
+            cursor.execute("insert into item (name, count, groceryList, frequency, username, visible) values ('%s', %i, '%s', '%i', '%s', '%i')" % (name, count, groceryList, 0, username, 1))
             print ("without note")
         connection.commit()
 
     print ("Added the item %s to the grocery list %s" % (input, groceryList))
     return ("Added the item %s to the grocery list %s" % (input, groceryList))
 		
-	
     
-    
-# Does this need to change from adding frequency and username columns? -- Aidan
-#UPDATE
+#UPDATE -- patch items
 @app.route("/items", methods = ['PATCH'])
 def updateItem():
     id = int(request.args.get('id'))
     name = request.args.get('name') 
-    count = int(request.args.get('count') )
+
+    # only convert to int if given, else we get an error converting null to int
+    count = request.args.get('count')
+    if count:
+        count = int(count)
+
     note = request.args.get('note')
+
+    # only convert to int if frequency is given, else we get an error converting null to int
+    frequency = request.args.get('frequency')
+    if frequency:
+        frequency = int(frequency)
+
+    username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
-    if note:
+
+    if frequency and id:
+        cursor.execute("UPDATE item SET frequency = %i where id = %i" % (frequency, id))
+        print ("update item set frequency = %i where id = %i" % (frequency, id))
+        connection.commit()
+        return ("update item set frequency = %i where id = %i" % (frequency, id))
+    elif username and id:
+        cursor.execute("UPDATE item SET username = '%s' where id = %i" % (username, id))
+        print ("update item set username = '%s' where id = %i" % (username, id))
+        connection.commit()
+        return ("update item set username = '%s' where id = %i" % (username, id))
+    elif note:
         cursor.execute("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
         print ("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
+        connection.commit()
         return ("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
     else:
         cursor.execute("update item set name = '%s', count = %i where id = %i" % (name, count, id))
         print ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
+        connection.commit()
         return ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
-    connection.commit()
-    
+        
+
+
 # DELETE items
 # Aidan edited to allow ex: id=1,2,3,4 so we can do this in 1 call instead of 100
 @app.route("/items", methods = ['DELETE'])
