@@ -81,7 +81,8 @@ def addGroceryList():
 #POST REQUEST items
 @app.route("/items", methods = ['POST'])
 def addItem():
-    name = request.args.get('name')
+    input = request.args.get('name')
+    nameParameters = input.split(',')
     count = int(request.args.get('count'))
     note = request.args.get('note')
     groceryList = request.args.get('groceryList')
@@ -89,16 +90,18 @@ def addItem():
     username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
-    if note:
-        cursor.execute("insert into item (name, count, note, groceryList, frequency, username) values ('%s', %i, '%s', '%s', '%i', '%s')" % (name, count, note, groceryList, frequency, username))
-        print ("with note")
-    else:
-        cursor.execute("insert into item (name, count, groceryList, frequency, username) values ('%s', %i, '%s', '%i', '%s')" % (name, count, groceryList, frequency, username))
-        print ("without note")
-    connection.commit()
+    for item in nameParameters:     
+        name = item
+        if note:
+            cursor.execute("insert into item (name, count, note, groceryList, frequency, username) values ('%s', %i, '%s', '%s', '%i', '%s')" % (name, count, note, groceryList, frequency, username))
+            print ("with note")
+        else:
+            cursor.execute("insert into item (name, count, groceryList, frequency, username) values ('%s', %i, '%s', '%i', '%s')" % (name, count, groceryList, frequency, username))
+            print ("without note")
+        connection.commit()
 
-    print ("Added the item %s to the grocery list %s" % (name, groceryList))
-    return ("Added the item %s to the grocery list %s" % (name, groceryList))
+    print ("Added the item %s to the grocery list %s" % (input, groceryList))
+    return ("Added the item %s to the grocery list %s" % (input, groceryList))
 		
 	
     
