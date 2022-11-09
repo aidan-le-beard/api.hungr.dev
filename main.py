@@ -114,19 +114,19 @@ def updateItem():
 
     # only convert to int if given, else we get an error converting null to int
     count = request.args.get('count')
-    if count:
+    if count is not None:
         count = int(count)
 
     note = request.args.get('note')
 
     # only convert to int if frequency is given, else we get an error converting null to int
     frequency = request.args.get('frequency')
-    if frequency:
+    if frequency is not None:
         frequency = int(frequency)
 
     # only convert to int if frequency is given, else we get an error converting null to int
     visible = request.args.get('visible')
-    if visible:
+    if visible is not None:
         visible = int(visible)
 
     username = request.args.get('username')
