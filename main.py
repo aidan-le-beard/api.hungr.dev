@@ -123,17 +123,20 @@ def updateItem():
         return ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
     connection.commit()
     
-# Does this need to change from adding frequency and username columns? -- Aidan
 # DELETE items
+# Aidan edited to allow ex: id=1,2,3,4 so we can do this in 1 call instead of 100
 @app.route("/items", methods = ['DELETE'])
 def deleteItem(): 
     connection = sqlite3.connect("dev.db")
-    id = int(request.args.get('id'))
+    input = request.args.get('id')
+    parameters = input.split(',')
     cursor = connection.cursor()
-    cursor.execute("delete from item where id = %i;" % id )
-    print("delete from item where id = %i" % id)
-    connection.commit()
-    return("delete from item where id = %i" % id)
+    for item in parameters: 
+        id = int(item)
+        cursor.execute("delete from item where id = %i;" % id )
+        print("delete from item where id = %i" % id)
+        connection.commit()
+    return("delete from item where id = %s" % input)
 
 # DELETE grocery lists
 @app.route("/groceryList", methods = ['DELETE'])
