@@ -93,10 +93,10 @@ def addItem():
     for item in nameParameters:     
         name = item
         if note:
-            cursor.execute("insert into item (name, count, note, groceryList, frequency, username, visible) values ('%s', %i, '%s', '%s', '%i', '%s', '%i')" % (name, count, note, groceryList, 0, username, 1))
+            cursor.execute("insert into item (name, count, note, groceryList, frequency, username, visible) values ('%s', %i, '%s', '%s', %i, '%s', %i)" % (name, count, note, groceryList, 0, username, 1))
             print ("with note")
         else:
-            cursor.execute("insert into item (name, count, groceryList, frequency, username, visible) values ('%s', %i, '%s', '%i', '%s', '%i')" % (name, count, groceryList, 0, username, 1))
+            cursor.execute("insert into item (name, count, groceryList, frequency, username, visible) values ('%s', %i, '%s', %i, '%s', %i)" % (name, count, groceryList, 0, username, 1))
             print ("without note")
         connection.commit()
 
@@ -107,7 +107,9 @@ def addItem():
 #UPDATE -- patch items
 @app.route("/items", methods = ['PATCH'])
 def updateItem():
-    id = int(request.args.get('id'))
+    input = request.args.get('id')
+    parameters = input.split(',')
+
     name = request.args.get('name') 
 
     # only convert to int if given, else we get an error converting null to int
@@ -122,30 +124,61 @@ def updateItem():
     if frequency:
         frequency = int(frequency)
 
+    # only convert to int if frequency is given, else we get an error converting null to int
+    visible = request.args.get('visible')
+    if visible:
+        visible = int(visible)
+
     username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
 
-    if frequency and id:
-        cursor.execute("UPDATE item SET frequency = %i where id = %i" % (frequency, id))
-        print ("update item set frequency = %i where id = %i" % (frequency, id))
-        connection.commit()
-        return ("update item set frequency = %i where id = %i" % (frequency, id))
-    elif username and id:
-        cursor.execute("UPDATE item SET username = '%s' where id = %i" % (username, id))
-        print ("update item set username = '%s' where id = %i" % (username, id))
-        connection.commit()
-        return ("update item set username = '%s' where id = %i" % (username, id))
+    if frequency is not None:
+        for item in parameters:
+            id = int(item)
+            cursor.execute("UPDATE item SET frequency = %i where id = %i" % (frequency, id))
+            print ("update item set frequency = %i where id = %i" % (frequency, id))
+            connection.commit()
+        return ("update item set frequency = %i where id = '%s'" % (frequency, input))
+
+    elif username and visible is not None:
+        for item in parameters:
+            id = int(item)
+            cursor.execute("UPDATE item SET username = '%s', visible = %i where id = %i" % (username, visible, id))
+            print ("UPDATE item SET username = '%s', visible = %i where id = %i" % (username, visible, id))
+            connection.commit()
+        return ("UPDATE item SET username = '%s', visible = %i where id = '%s'" % (username, visible, input))
+
+    elif username:
+        for item in parameters:
+            id = int(item)
+            cursor.execute("UPDATE item SET username = '%s' where id = %i" % (username, id))
+            print ("update item set username = '%s' where id = %i" % (username, id))
+            connection.commit()
+        return ("update item set username = '%s' where id = '%s'" % (username, input))
+
+    elif visible is not None:
+        for item in parameters:
+            id = int(item)
+            cursor.execute("UPDATE item SET visible = %i where id = %i" % (visible, id))
+            print("UPDATE item SET visible = %i where id = %i" % (visible, id))
+            connection.commit()
+        return("UPDATE item SET visible = %i where id = '%s'" % (visible, input))
+        
     elif note:
-        cursor.execute("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
-        print ("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
-        connection.commit()
-        return ("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
+        for item in parameters:
+            id = int(item)
+            cursor.execute("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
+            print ("update item set name = '%s', count = %i, note = '%s' where id = %i" % (name, count, note, id))
+            connection.commit()
+        return ("update item set name = '%s', count = %i, note = '%s' where id = '%s'" % (name, count, note, input))
     else:
-        cursor.execute("update item set name = '%s', count = %i where id = %i" % (name, count, id))
-        print ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
-        connection.commit()
-        return ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
+        for item in parameters:
+            id = int(item)
+            cursor.execute("update item set name = '%s', count = %i where id = %i" % (name, count, id))
+            print ("update item set name = '%s', count = %i where id = %i" % (name, count, id))
+            connection.commit()
+        return ("update item set name = '%s', count = %i where id = '%s'" % (name, count, input))
         
 
 
