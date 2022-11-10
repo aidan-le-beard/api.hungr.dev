@@ -89,8 +89,7 @@ def addItem():
     username = request.args.get('username')
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
-    for item in nameParameters:     
-        name = item
+    for name in nameParameters:     
         if note:
             cursor.execute("insert into item (name, count, note, groceryList, frequency, username, visible) values ('%s', %i, '%s', '%s', %i, '%s', %i)" % (name, count, note, groceryList, 0, username, 1))
             print ("with note")
@@ -123,11 +122,8 @@ def updateItem():
     # allow multiple frequencies for one specific PATCH, otherwise if only 1 is given,
     # convert it to an int so the other PATCHes keep working
     frequencyParameters = request.args.get('frequency')
-    frequency = None
     if frequencyParameters is not None:
         frequencyParameters = frequencyParameters.split(',')
-        if len(frequencyParameters) == 1:
-            frequency = int(frequencyParameters[0])
 
     # only convert to int if frequency is given, else we get an error converting null to int
     visible = request.args.get('visible')
@@ -138,15 +134,8 @@ def updateItem():
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
 
-    if frequency is not None:
-        for item in parameters:
-            id = int(item)
-            cursor.execute("UPDATE item SET frequency = %i where id = %i" % (frequency, id))
-            print ("update item set frequency = %i where id = %i" % (frequency, id))
-            connection.commit()
-        return ("update item set frequency = %i where id = '%s'" % (frequency, input))
-
-    elif frequencyParameters is not None:
+    # patch matching list of id=a,b,c with matching list of frequency=1,2,3
+    if frequencyParameters is not None:
         i = 0
         while i < len(parameters):
             id = int(parameters[i])
@@ -157,6 +146,7 @@ def updateItem():
             i += 1
         return ("update item set frequency = '%s' where id = '%s'" % (frequencyParameters, input))
 
+    # patch changing username and visibility based on id
     elif username and visible is not None:
         for item in parameters:
             id = int(item)
@@ -165,6 +155,7 @@ def updateItem():
             connection.commit()
         return ("UPDATE item SET username = '%s', visible = %i where id = '%s'" % (username, visible, input))
 
+    # patch username to some IDs
     elif username:
         for item in parameters:
             id = int(item)
@@ -173,6 +164,7 @@ def updateItem():
             connection.commit()
         return ("update item set username = '%s' where id = '%s'" % (username, input))
 
+    # patch a group of IDs to either all have visible column of 0 or all of 1
     elif visible is not None:
         for item in parameters:
             id = int(item)
@@ -196,7 +188,6 @@ def updateItem():
             connection.commit()
         return ("update item set name = '%s', count = %i where id = '%s'" % (name, count, input))
         
-
 
 # DELETE items
 # Aidan edited to allow ex: id=1,2,3,4 so we can do this in 1 call instead of 100
