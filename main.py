@@ -13,7 +13,6 @@ app.debug = True
 def hello_world(): 
     return "<p>welcome to hungr</p>"
 
-
 # GET REQUEST groceryList
 @app.route("/groceryList", methods = ['GET'])
 def getGroceryLists(): 
@@ -106,6 +105,7 @@ def addItem():
     
 #UPDATE -- patch items
 @app.route("/items", methods = ['PATCH'])
+
 def updateItem():
     input = request.args.get('id')
     parameters = input.split(',')
@@ -120,9 +120,14 @@ def updateItem():
     note = request.args.get('note')
 
     # only convert to int if frequency is given, else we get an error converting null to int
-    frequency = request.args.get('frequency')
-    if frequency is not None:
-        frequency = int(frequency)
+    # allow multiple frequencies for one specific PATCH, otherwise if only 1 is given,
+    # convert it to an int so the other PATCHes keep working
+    frequencyParameters = request.args.get('frequency')
+    frequency = None
+    if frequencyParameters is not None:
+        frequencyParameters = frequencyParameters.split(',')
+        if len(frequencyParameters) == 1:
+            frequency = int(frequencyParameters[0])
 
     # only convert to int if frequency is given, else we get an error converting null to int
     visible = request.args.get('visible')
@@ -140,6 +145,17 @@ def updateItem():
             print ("update item set frequency = %i where id = %i" % (frequency, id))
             connection.commit()
         return ("update item set frequency = %i where id = '%s'" % (frequency, input))
+
+    elif frequencyParameters is not None:
+        i = 0
+        while i < len(parameters):
+            id = int(parameters[i])
+            frequency = int(frequencyParameters[i])
+            cursor.execute("UPDATE item SET frequency = %i where id = %i" % (frequency, id))
+            print ("update item set frequency = %i where id = %i" % (frequency, id))
+            connection.commit()
+            i += 1
+        return ("update item set frequency = '%s' where id = '%s'" % (frequencyParameters, input))
 
     elif username and visible is not None:
         for item in parameters:
