@@ -55,7 +55,10 @@ def getListItems():
 def signUp():
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
-    cursor.execute("insert into user (username, password) values ('%s', '%s')" % (request.args.get('username'), request.args.get('password')))
+    username = request.args.get('username')
+    if cursor.execute("SELECT COUNT(*) FROM user WHERE username = '%s'" % (username)).fetchone()[0] != 0:
+        return "Username Taken"
+    cursor.execute("insert into user (username, password) values ('%s', '%s')" % (username, request.args.get('password')))
     connection.commit()
     return "success"
     
