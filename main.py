@@ -84,10 +84,13 @@ def login():
 def addGroceryList():
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
-    cursor.execute("insert into groceryList (name) values ('%s')" % request.args.get('name'))
-    print ("Successfully added the Grocery List %s" % request.args.get('name'))
+    name = request.args.get('name')
+    if cursor.execute("SELECT COUNT(*) FROM groceryList WHERE name = '%s'" % (name)).fetchone()[0] != 0:
+        return "Group Already Added"
+    cursor.execute("insert into groceryList (name) values ('%s')" % (name))
+    print ("Successfully added the Grocery List '%s'" % (name))
     connection.commit()
-    return "success"
+    return ("success")
 
 #POST REQUEST items
 @app.route("/items", methods = ['POST'])
