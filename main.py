@@ -128,9 +128,13 @@ def updateGroceryList():
 @app.route("/items", methods = ['PATCH'])
 def updateItem():
     input = request.args.get('id')
-    parameters = input.split(',')
+    if input is not None:
+        parameters = input.split(',')
 
     name = request.args.get('name') 
+
+    names = request.args.get('names')
+    groceryList = request.args.get('groceryList')
 
     # only convert to int if given, else we get an error converting null to int
     count = request.args.get('count')
@@ -138,13 +142,6 @@ def updateItem():
         count = int(count)
 
     note = request.args.get('note')
-
-    # only convert to int if frequency is given, else we get an error converting null to int
-    # allow multiple frequencies for one specific PATCH, otherwise if only 1 is given,
-    # convert it to an int so the other PATCHes keep working
-    frequencyParameters = request.args.get('frequency')
-    if frequencyParameters is not None:
-        frequencyParameters = frequencyParameters.split(',')
 
     # only convert to int if frequency is given, else we get an error converting null to int
     visible = request.args.get('visible')
@@ -156,16 +153,11 @@ def updateItem():
     cursor = connection.cursor()
 
     # patch matching list of id=a,b,c with matching list of frequency=1,2,3
-    if frequencyParameters is not None:
-        i = 0
-        while i < len(parameters):
-            id = int(parameters[i])
-            frequency = int(frequencyParameters[i])
-            cursor.execute("UPDATE item SET frequency = %i where id = %i" % (frequency, id))
-            print ("update item set frequency = %i where id = %i" % (frequency, id))
-            connection.commit()
-            i += 1
-        return ("update item set frequency = '%s' where id = '%s'" % (frequencyParameters, input))
+    if names is not None:
+        cursor.execute("UPDATE item SET frequency = frequency + 1 WHERE name IN (%s) AND groceryList = '%s'" % (names, groceryList))
+        print ("UPDATE item SET frequency = frequency + 1 WHERE name IN (%s) AND groceryList = '%s'" % (names, groceryList))
+        connection.commit()
+        return ("UPDATE item SET frequency = frequency + 1 WHERE name IN (%s) AND groceryList = '%s'" % (names, groceryList))
 
     # patch changing username and visibility based on id
     elif username and visible is not None:
