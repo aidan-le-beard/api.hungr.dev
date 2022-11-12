@@ -19,11 +19,16 @@ def getGroceryLists():
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
     data = []
+    name = request.args.get('name')
+    if name is not None:
+        results = cursor.execute("select * from groceryList WHERE name = '%s'" % (name))
+    else:
+        results = cursor.execute("select * from groceryList")
 
-    results = cursor.execute("select * from groceryList")
     for groceryList in results: 
         data.append(dict(
-         name=groceryList[0]
+         name=groceryList[0],
+         purchases=groceryList[1]
          ))
     
     return json.dumps(data)
@@ -106,11 +111,21 @@ def addItem():
 
     print ("Added the item %s to the grocery list %s" % (input, groceryList))
     return ("Added the item %s to the grocery list %s" % (input, groceryList))
-		
+
+#UPDATE -- patch groceryList
+# increments purchases for the submitted groceryList
+@app.route("/groceryList", methods = ['PATCH'])
+def updateGroceryList():
+    connection = sqlite3.connect("dev.db")
+    cursor = connection.cursor()
+    name = request.args.get('name')
+    cursor.execute("UPDATE groceryList SET purchases = purchases + %i WHERE name = '%s'" % (1, name))
+    connection.commit()
+    print("UPDATE groceryList SET purchases = purchases + %i WHERE name = '%s'" % (1, name))
+    return("UPDATE groceryList SET purchases = purchases + %i WHERE name = '%s'" % (1, name))
     
 #UPDATE -- patch items
 @app.route("/items", methods = ['PATCH'])
-
 def updateItem():
     input = request.args.get('id')
     parameters = input.split(',')
