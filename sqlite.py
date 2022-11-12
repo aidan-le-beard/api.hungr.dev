@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-connection = sqlite3.connect('test.db')
+connection = sqlite3.connect('dev.db')
 print("Opened Correctly")
 
 # connection.execute(''' 
@@ -31,7 +31,7 @@ print("Opened Correctly")
 # 
 # print("Added Values")
 
-cursor = connection.execute("SELECT id, name, address, salary from COMPANY")
+cursor = connection.execute("SELECT * from item WHERE groceryList = 'nxx' ORDER BY frequency DESC")
 
 data = cursor.fetchall()
 

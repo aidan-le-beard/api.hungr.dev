@@ -34,8 +34,11 @@ def getListItems():
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
     data = []
-
-    results = cursor.execute("select * from item where groceryList = '%s'" %  request.args.get('groceryList')).fetchall()
+    desc = request.args.get('desc')
+    if desc is not None:
+        results = cursor.execute("SELECT * from item WHERE groceryList = '%s' ORDER BY frequency DESC" % request.args.get('groceryList')).fetchall()
+    else:
+        results = cursor.execute("select * from item where groceryList = '%s'" %  request.args.get('groceryList')).fetchall()
     print (results)
     for item in results: 
         data.append(dict(
