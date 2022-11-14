@@ -164,30 +164,24 @@ def updateItem():
 
     # patch changing username and visibility based on id
     elif username and visible is not None:
-        for item in parameters:
-            id = int(item)
-            cursor.execute("UPDATE item SET username = '%s', visible = %i where id = %i" % (username, visible, id))
-            print ("UPDATE item SET username = '%s', visible = %i where id = %i" % (username, visible, id))
-            connection.commit()
-        return ("UPDATE item SET username = '%s', visible = %i where id = '%s'" % (username, visible, input))
+        cursor.execute("UPDATE item SET username = '%s', visible = %i WHERE id IN (%s)" % (username, visible, input))
+        print ("UPDATE item SET username = '%s', visible = %i WHERE id IN (%s)" % (username, visible, input))
+        connection.commit()
+        return ("UPDATE item SET username = '%s', visible = %i WHERE id IN (%s)" % (username, visible, input))
 
     # patch username to some IDs
     elif username:
-        for item in parameters:
-            id = int(item)
-            cursor.execute("UPDATE item SET username = '%s' where id = %i" % (username, id))
-            print ("update item set username = '%s' where id = %i" % (username, id))
-            connection.commit()
-        return ("update item set username = '%s' where id = '%s'" % (username, input))
+        cursor.execute("UPDATE item SET username = '%s' WHERE id IN (%s)" % (username, input))
+        print ("UPDATE item SET username = '%s' WHERE id IN (%s)" % (username, input))
+        connection.commit()
+        return ("UPDATE item SET username = '%s' WHERE id IN (%s)" % (username, input))
 
     # patch a group of IDs to either all have visible column of 0 or all of 1
     elif visible is not None:
-        for item in parameters:
-            id = int(item)
-            cursor.execute("UPDATE item SET visible = %i where id = %i" % (visible, id))
-            print("UPDATE item SET visible = %i where id = %i" % (visible, id))
-            connection.commit()
-        return("UPDATE item SET visible = %i where id = '%s'" % (visible, input))
+        cursor.execute("UPDATE item SET visible = %i WHERE id IN (%s)" % (visible, input))
+        print("UPDATE item SET visible = %i WHERE id IN (%s)" % (visible, input))
+        connection.commit()
+        return("UPDATE item SET visible = %i WHERE id IN (%s)" % (visible, input))
         
     elif note:
         for item in parameters:
