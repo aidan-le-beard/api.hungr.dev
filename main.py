@@ -22,8 +22,8 @@ def getGroceryLists():
     name = request.args.get('name')
     if name is not None:
         results = cursor.execute("select * from groceryList WHERE name = '%s'" % (name))
-    else:
-        results = cursor.execute("select * from groceryList")
+#    else:
+#        results = cursor.execute("select * from groceryList")
 
     for groceryList in results: 
         data.append(dict(
@@ -58,7 +58,7 @@ def getListItems():
             
     return json.dumps(data)
     
-#POST REQUEST signup
+""" #POST REQUEST signup
 @app.route("/signup", methods = ['POST'])
 def signUp():
     connection = sqlite3.connect("dev.db")
@@ -68,16 +68,16 @@ def signUp():
         return "Username Taken"
     cursor.execute("insert into user (username, password) values ('%s', '%s')" % (username, request.args.get('password')))
     connection.commit()
-    return "success"
+    return "success" """
     
-#POST REQUEST login
+""" #POST REQUEST login
 @app.route("/login", methods = ['POST'])
 def login():
     if checkPassword(username=request.args.get('username'), password=request.args.get('password')):
         return "User Logged in"
     else: 
         print(request.args.get('username'), request.args.get('password'))
-        return "No User or Incorrect Password", 401
+        return "No User or Incorrect Password", 401 """
             
 #POST REQUEST groceryList
 @app.route("/groceryList", methods = ['POST'])
@@ -155,7 +155,7 @@ def updateItem():
     connection = sqlite3.connect("dev.db")
     cursor = connection.cursor()
 
-    # patch matching list of id=a,b,c with matching list of frequency=1,2,3
+    # increment each given name
     if names is not None:
         cursor.execute("UPDATE item SET frequency = frequency + 1 WHERE name IN (%s) AND groceryList = '%s'" % (names, groceryList))
         print ("UPDATE item SET frequency = frequency + 1 WHERE name IN (%s) AND groceryList = '%s'" % (names, groceryList))
@@ -199,7 +199,7 @@ def updateItem():
         return ("update item set name = '%s', count = %i where id = '%s'" % (name, count, input))
         
 
-# DELETE items
+""" # DELETE items
 # Aidan edited to allow ex: id=1,2,3,4 so we can do this in 1 call instead of 100
 @app.route("/items", methods = ['DELETE'])
 def deleteItem(): 
@@ -212,9 +212,9 @@ def deleteItem():
         cursor.execute("delete from item where id = %i;" % id )
         print("delete from item where id = %i" % id)
         connection.commit()
-    return("delete from item where id = %s" % input)
+    return("delete from item where id = %s" % input) """
 
-# DELETE grocery lists
+""" # DELETE grocery lists
 @app.route("/groceryList", methods = ['DELETE'])
 def deleteGroceryList(): 
     connection = sqlite3.connect("dev.db")
@@ -223,9 +223,9 @@ def deleteGroceryList():
     cursor.execute("delete from groceryList where name = '%s'" % name )
     print("delete from groceryList where name = '%s'" % name )
     connection.commit()
-    return("delete from groceryList where name = '%s'" % name )
+    return("delete from groceryList where name = '%s'" % name ) """
 
-# Helper Functions
+""" # Helper Functions
 def checkPassword(username: str, password: str) -> bool: 
     print ("Given: ",username, password)
     connection = sqlite3.connect("dev.db")
@@ -239,4 +239,4 @@ def checkPassword(username: str, password: str) -> bool:
         return False
     if realPassword[0] == password:
         print("Successful Login")
-        return True
+        return True """
